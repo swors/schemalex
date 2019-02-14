@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/schemalex/schemalex/internal/errors"
-	"github.com/schemalex/schemalex/model"
+	"github.com/swors/schemalex/internal/errors"
+	"github.com/swors/schemalex/model"
 )
 
 const (
@@ -692,7 +692,7 @@ func (p *Parser) parseCreateTableOptions(ctx *parseCtx, table model.Table) error
 			default:
 				return newParseError(ctx, t, "expected CHARACTER or COLLATE")
 			}
-			if err := p.parseCreateTableOptionValue(ctx, table, name, IDENT, BACKTICK_IDENT); err != nil {
+			if err := p.parseCreateTableOptionValue(ctx, table, name, SINGLE_QUOTE_IDENT, IDENT); err != nil {
 				return err
 			}
 		case CHARACTER:
@@ -700,11 +700,11 @@ func (p *Parser) parseCreateTableOptions(ctx *parseCtx, table model.Table) error
 			if t := ctx.next(); t.Type != SET {
 				return newParseError(ctx, t, "expected SET")
 			}
-			if err := p.parseCreateTableOptionValue(ctx, table, "DEFAULT CHARACTER SET", IDENT, BACKTICK_IDENT); err != nil {
+			if err := p.parseCreateTableOptionValue(ctx, table, "DEFAULT CHARACTER SET", SINGLE_QUOTE_IDENT, IDENT); err != nil {
 				return err
 			}
 		case COLLATE:
-			if err := p.parseCreateTableOptionValue(ctx, table, "DEFAULT COLLATE", IDENT, BACKTICK_IDENT); err != nil {
+			if err := p.parseCreateTableOptionValue(ctx, table, "DEFAULT COLLATE", SINGLE_QUOTE_IDENT, IDENT); err != nil {
 				return err
 			}
 		case CHECKSUM:
@@ -792,6 +792,7 @@ func (p *Parser) parseCreateTableOptions(ctx *parseCtx, table model.Table) error
 
 		// except for the case where we continue to the next option (COMMA)
 		// we should expect the end of this statement
+		ctx.skipWhiteSpaces()
 		switch t := ctx.peek(); t.Type {
 		case EOF:
 			// end of table options, end of input
@@ -806,7 +807,7 @@ func (p *Parser) parseCreateTableOptions(ctx *parseCtx, table model.Table) error
 
 // parse column options
 //
-// Also see: https://github.com/schemalex/schemalex/pull/40
+// Also see: https://github.com/swors/schemalex/pull/40
 // Seems like MySQL doesn't really care about the order of some elements in the
 // column options, although the docs (https://dev.mysql.com/doc/refman/5.7/en/create-table.html)
 // seem to state otherwise.

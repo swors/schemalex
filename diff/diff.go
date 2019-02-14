@@ -8,11 +8,13 @@ import (
 	"reflect"
 	"sort"
 
+
 	"github.com/deckarep/golang-set"
-	"github.com/schemalex/schemalex"
-	"github.com/schemalex/schemalex/format"
-	"github.com/schemalex/schemalex/internal/errors"
-	"github.com/schemalex/schemalex/model"
+
+	"github.com/swors/schemalex"
+	"github.com/swors/schemalex/format"
+	"github.com/swors/schemalex/internal/errors"
+	"github.com/swors/schemalex/model"
 )
 
 type diffCtx struct {
@@ -30,6 +32,7 @@ func newDiffCtx(from, to model.Stmts) *diffCtx {
 		}
 	}
 	toSet := mapset.NewSet()
+
 	for _, stmt := range to {
 		if cs, ok := stmt.(model.Table); ok {
 			toSet.Add(cs.ID())

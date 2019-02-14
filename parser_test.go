@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/pmezard/go-difflib/difflib"
-	"github.com/schemalex/schemalex"
-	"github.com/schemalex/schemalex/format"
 	"github.com/stretchr/testify/assert"
+	"github.com/swors/schemalex"
+	"github.com/swors/schemalex/format"
 )
 
 var testFile = ""
@@ -172,17 +172,17 @@ primary key (id, c)
 		Expect: "CREATE TABLE `foo` LIKE `bar`",
 	})
 	parse("ColumnOptionPrimaryKey", &Spec{
-		// see https://github.com/schemalex/schemalex/pull/40
+		// see https://github.com/swors/schemalex/pull/40
 		Input:  "CREATE TABLE foo (id INTEGER PRIMARY KEY AUTO_INCREMENT)",
 		Expect: "CREATE TABLE `foo` (\n`id` INT (11) DEFAULT NULL AUTO_INCREMENT,\nPRIMARY KEY (`id`)\n)",
 	})
 	parse("ColumnOptionCommentPrimaryKey1", &Spec{
-		// see https://github.com/schemalex/schemalex/pull/40
+		// see https://github.com/swors/schemalex/pull/40
 		Input:  "CREATE TABLE `test` (\n`id` int(11) PRIMARY KEY COMMENT 'aaa' NOT NULL,\nhoge int default 1 not null COMMENT 'bbb' UNIQUE\n);",
 		Expect: "CREATE TABLE `test` (\n`id` INT (11) NOT NULL COMMENT 'aaa',\n`hoge` INT (11) NOT NULL DEFAULT 1 COMMENT 'bbb',\nPRIMARY KEY (`id`),\nUNIQUE INDEX `hoge` (`hoge`)\n)",
 	})
 	parse("ColumnOptionCommentPrimaryKey2", &Spec{
-		// see https://github.com/schemalex/schemalex/pull/40
+		// see https://github.com/swors/schemalex/pull/40
 		Input:  "CREATE TABLE `test` (\n`id` int(11) COMMENT 'aaa' PRIMARY KEY NOT NULL,\nhoge int default 1 UNIQUE not null COMMENT 'bbb'\n);",
 		Expect: "CREATE TABLE `test` (\n`id` INT (11) NOT NULL COMMENT 'aaa',\n`hoge` INT (11) NOT NULL DEFAULT 1 COMMENT 'bbb',\nPRIMARY KEY (`id`),\nUNIQUE INDEX `hoge` (`hoge`)\n)",
 	})
@@ -264,6 +264,16 @@ primary key (id, c)
 			"  CONSTRAINT `some_table__user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE SET NULL\r\n" +
 			") ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
 		Expect: "CREATE TABLE `some_table` (\n`id` INT (10) UNSIGNED NOT NULL AUTO_INCREMENT,\n`user_id` VARCHAR (32) DEFAULT NULL,\n`context` JSON DEFAULT NULL,\n`created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,\nPRIMARY KEY (`id`),\nINDEX `created_at` (`created_at` DESC),\nINDEX `user_id_idx` (`user_id`),\nINDEX `some_table__user_id` (`user_id`),\nCONSTRAINT `some_table__user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE SET NULL\n) ENGINE = InnoDB, AUTO_INCREMENT = 19, DEFAULT CHARACTER SET = utf8mb4, DEFAULT COLLATE = utf8mb4_0900_ai_ci",
+	})
+
+	parse("CreateTableCOLLATE", &Spec{
+		Input:  "CREATE TABLE `COLLATE` (\n`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT\n)\nCOLLATE='utf8_general_ci'\nENGINE=InnoDB\n;",
+		Expect: "CREATE TABLE `COLLATE` (\n`id` INT (10) UNSIGNED NOT NULL AUTO_INCREMENT\n) DEFAULT COLLATE = 'utf8_general_ci', ENGINE = InnoDB",
+	})
+
+	parse("CreateTableWSEof", &Spec{
+		Input:  "CREATE TABLE `end` (`id` INT(10) UNSIGNED NOT NULL)\n\n;\n",
+		Expect: "CREATE TABLE `end` (\n`id` INT (10) UNSIGNED NOT NULL\n)",
 	})
 }
 

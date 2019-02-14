@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/schemalex/schemalex/internal/errors"
-	"github.com/schemalex/schemalex/internal/util"
-	"github.com/schemalex/schemalex/model"
+	"github.com/swors/schemalex/internal/errors"
+	"github.com/swors/schemalex/internal/util"
+	"github.com/swors/schemalex/model"
 )
 
 type fmtCtx struct {

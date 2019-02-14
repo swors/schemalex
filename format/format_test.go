@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/schemalex/schemalex/format"
-	"github.com/schemalex/schemalex/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/swors/schemalex/format"
+	"github.com/swors/schemalex/model"
 )
 
 // XXX This test needs serious loving.

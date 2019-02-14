@@ -10,8 +10,8 @@ import (
 	"runtime"
 
 	"github.com/pkg/errors"
-	"github.com/schemalex/schemalex"
-	"github.com/schemalex/schemalex/lint"
+	"github.com/swors/schemalex"
+	"github.com/swors/schemalex/lint"
 )
 
 var version string
@@ -51,7 +51,7 @@ Examples:
 * Lint an online mysql schema
   schemalint "mysql://user:password@tcp(host:port)/dbname?option=value"
 
-* Lint a file in local git repository 
+* Lint a file in local git repository
   schemalint local-git:///path/to/repo?file=foo.sql&commitish=deadbeaf
 
 * Lint schema from stdin against local file

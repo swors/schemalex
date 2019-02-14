@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/schemalex/schemalex/diff"
 	"github.com/stretchr/testify/assert"
+	"github.com/swors/schemalex/diff"
 )
 
 func TestDiff(t *testing.T) {
