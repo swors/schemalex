@@ -42,6 +42,10 @@ func TestParser(t *testing.T) {
 	parse("CreateSCHEMA", &Spec{
 		Input: "CREATE SCHEMA IF NOT EXISTS `flower_server`",
 	})
+	parse("CreateDatabaseWithOptions", &Spec{
+		Input: "create DATABASE IF NOT EXISTS hoge \nDEFAULT CHARACTER SET utf8",
+	})
+
 	parse("CreateDatabaseIfNotExists", &Spec{
 		Input: "create DATABASE IF NOT EXISTS hoge",
 	})

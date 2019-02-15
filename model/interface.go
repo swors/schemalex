@@ -382,9 +382,26 @@ type Database interface {
 	Name() string
 	IsIfNotExists() bool
 	SetIfNotExists(bool) Database
+
+	AddOption(DatabaseOption) Database
+	Options() chan DatabaseOption
+}
+
+type DatabaseOption interface {
+	Stmt
+	Key() string
+	Value() string
+	NeedQuotes() bool
 }
 
 type database struct {
 	name        string
 	ifnotexists bool
+	options     []DatabaseOption
+}
+
+type databaseopt struct {
+	key        string
+	value      string
+	needQuotes bool
 }

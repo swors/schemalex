@@ -248,9 +248,106 @@ func (p *Parser) parseCreateDatabase(ctx *parseCtx) (model.Database, error) {
 		return nil, newParseError(ctx, t, "expected IDENT, BACKTICK_IDENT")
 	}
 
+	ctx.skipWhiteSpaces()
+
+	switch t := ctx.peek(); t.Type {
+	case EOF, SEMICOLON:
+		ctx.advance()
+		break
+	default:
+		ctx.advance()
+		if err := p.parseCreateDatabaseOptions(ctx, database); err != nil {
+			return nil, err
+		}
+
+		// partition option
+		if !p.eol(ctx) {
+			break
+		}
+		break
+	}
+
 	database.SetIfNotExists(notexists)
-	p.eol(ctx)
 	return database, nil
+
+}
+
+func (p *Parser) parseCreateDatabaseOptionValue(ctx *parseCtx, database model.Database, name string, follow ...TokenType) error {
+	ctx.skipWhiteSpaces()
+	if t := ctx.peek(); t.Type == EQUAL {
+		ctx.advance()
+		ctx.skipWhiteSpaces()
+	}
+
+	t := ctx.next()
+	for _, typ := range follow {
+		if typ != t.Type {
+			continue
+		}
+		var quotes bool
+		switch t.Type {
+		case SINGLE_QUOTE_IDENT, DOUBLE_QUOTE_IDENT:
+			quotes = true
+		}
+		database.AddOption(model.NewDatabaseOption(name, t.Value, quotes))
+		return nil
+	}
+	return newParseError(ctx, t, "expected %v", follow)
+}
+
+func (p *Parser) parseCreateDatabaseOptions(ctx *parseCtx, database model.Database) error {
+	ctx.skipWhiteSpaces()
+
+	for {
+		switch t := ctx.next(); t.Type {
+		case DEFAULT:
+			var name string
+			ctx.skipWhiteSpaces()
+			switch t := ctx.next(); t.Type {
+			case CHARSET:
+				name = "DEFAULT CHARACTER SET"
+			case CHARACTER:
+				ctx.skipWhiteSpaces()
+				if t := ctx.next(); t.Type != SET {
+					return newParseError(ctx, t, "expected SET")
+				}
+				name = "DEFAULT CHARACTER SET"
+			case COLLATE:
+				name = "DEFAULT COLLATE"
+			default:
+				return newParseError(ctx, t, "expected CHARACTER or COLLATE")
+			}
+			if err := p.parseCreateDatabaseOptionValue(ctx, database, name, SINGLE_QUOTE_IDENT, IDENT); err != nil {
+				return err
+			}
+		case CHARACTER:
+			ctx.skipWhiteSpaces()
+			if t := ctx.next(); t.Type != SET {
+				return newParseError(ctx, t, "expected SET")
+			}
+			if err := p.parseCreateDatabaseOptionValue(ctx, database, "DEFAULT CHARACTER SET", SINGLE_QUOTE_IDENT, IDENT); err != nil {
+				return err
+			}
+		case COLLATE:
+			if err := p.parseCreateDatabaseOptionValue(ctx, database, "DEFAULT COLLATE", SINGLE_QUOTE_IDENT, IDENT); err != nil {
+				return err
+			}
+			return nil
+		default:
+			return newParseError(ctx, t, "unexpected token in table options: "+t.Type.String())
+		}
+
+		ctx.skipWhiteSpaces()
+		switch t := ctx.peek(); t.Type {
+		case EOF:
+			// end of table options, end of input
+			ctx.advance()
+			return nil
+		case SEMICOLON:
+			// end of table options, end of statement
+			return nil
+		}
+	}
 }
 
 // http://dev.mysql.com/doc/refman/5.6/en/create-table.html
