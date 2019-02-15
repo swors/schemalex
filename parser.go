@@ -208,7 +208,7 @@ func (p *Parser) parseCreate(ctx *parseCtx) (model.Stmt, error) {
 	}
 	ctx.skipWhiteSpaces()
 	switch t := ctx.peek(); t.Type {
-	case DATABASE:
+	case DATABASE, SCHEMA:
 		if _, err := p.parseCreateDatabase(ctx); err != nil {
 			return nil, err
 		}
@@ -223,7 +223,7 @@ func (p *Parser) parseCreate(ctx *parseCtx) (model.Stmt, error) {
 // https://dev.mysql.com/doc/refman/5.5/en/create-database.html
 // TODO: charset, collation
 func (p *Parser) parseCreateDatabase(ctx *parseCtx) (model.Database, error) {
-	if t := ctx.next(); t.Type != DATABASE {
+	if t := ctx.next(); t.Type != DATABASE && t.Type != SCHEMA {
 		return nil, errors.New(`expected DATABASE`)
 	}
 

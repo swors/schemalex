@@ -69,6 +69,7 @@ const (
 	CURRENT_TIMESTAMP
 	DATA
 	DATABASE
+	SCHEMA
 	DATE
 	DATETIME
 	DECIMAL
@@ -183,6 +184,7 @@ var keywordIdentMap = map[string]TokenType{
 	"CURRENT_TIMESTAMP":  CURRENT_TIMESTAMP,
 	"DATA":               DATA,
 	"DATABASE":           DATABASE,
+	"SCHEMA":             SCHEMA,
 	"DATE":               DATE,
 	"DATETIME":           DATETIME,
 	"DECIMAL":            DECIMAL,
@@ -366,6 +368,8 @@ func (t TokenType) String() string {
 		return "DATA"
 	case DATABASE:
 		return "DATABASE"
+	case SCHEMA:
+		return "SCHEMA"
 	case DATE:
 		return "DATE"
 	case DATETIME:

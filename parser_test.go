@@ -39,6 +39,9 @@ func TestParser(t *testing.T) {
 	parse("CreateDatabase", &Spec{
 		Input: "create DATABASE hoge",
 	})
+	parse("CreateSCHEMA", &Spec{
+		Input: "CREATE SCHEMA IF NOT EXISTS `flower_server`",
+	})
 	parse("CreateDatabaseIfNotExists", &Spec{
 		Input: "create DATABASE IF NOT EXISTS hoge",
 	})

@@ -99,6 +99,7 @@ func _main() error {
 		{Ident: "CURRENT_TIMESTAMP"},
 		{Ident: "DATA"},
 		{Ident: "DATABASE"},
+		{Ident: "SCHEMA"},
 		{Ident: "DATE"},
 		{Ident: "DATETIME"},
 		{Ident: "DECIMAL"},
